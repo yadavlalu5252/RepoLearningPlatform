@@ -1,0 +1,197 @@
+﻿@model List<RepoLearningPlatform.Models.Purchase>
+
+@{
+    ViewData["Title"] = "My Courses";
+}
+
+<div class="container mt-4">
+
+    <h2>My Courses</h2>
+
+    <div class="row mt-4">
+
+        @foreach (var item in Model)
+        {
+            <div class="col-md-4 mb-4">
+
+                <div class="card h-100">
+
+                    @if (item.MasterCourseId != null)
+                    {
+                        var validUntil = item.PurchaseDate.AddDays(30);
+                        var daysLeft = (validUntil.Date - DateTime.Now.Date).Days;
+
+                        if (daysLeft < 0)
+                        {
+                            daysLeft = 0;
+                        }
+
+                        <img src="@item.MasterCourseData.Thumbnail"
+                             class="card-img-top"
+                             style="height:200px; object-fit:cover;" />
+
+                        <div class="card-body">
+
+                            <h5 class="card-title">
+                                @item.MasterCourseData.MasterCourseName
+                            </h5>
+
+                            <span class="badge bg-success">
+                                Master Course
+                            </span>
+
+                            <p class="mt-3 mb-2">
+                                <strong>Amount Paid:</strong>
+                                ₹@item.Amount
+                            </p>
+
+                            <p class="mb-2">
+                                <strong>Purchased:</strong>
+                                @item.PurchaseDate.ToString("dd-MM-yyyy")
+                            </p>
+
+                            <p class="mb-2">
+                                <strong>Days Left:</strong>
+                                @daysLeft
+                            </p>
+
+                            <p class="mb-2">
+                                <strong>Valid Until:</strong>
+                                @validUntil.ToString("dd-MM-yyyy")
+                            </p>
+
+                            <div class="d-grid mt-3">
+                                <a asp-controller="MyCourses"
+                                   asp-action="StartCourse"
+                                   asp-route-id="@item.MasterCourseId"
+                                   class="btn btn-primary">
+                                    ▶ Play
+                                </a>
+                            </div>
+
+                        </div>
+                    }
+
+                    @if (item.SubCourseId != null)
+                    {
+                        var validUntil = item.PurchaseDate.AddDays(30);
+                        var daysLeft = (validUntil.Date - DateTime.Now.Date).Days;
+
+                        if (daysLeft < 0)
+                        {
+                            daysLeft = 0;
+                        }
+
+                        <img src="@item.SubCourseData.Thumbnail"
+                             class="card-img-top"
+                             style="height:200px; object-fit:cover;" />
+
+                        <div class="card-body">
+
+                            <h5 class="card-title">
+                                @item.SubCourseData.SubCourseName
+                            </h5>
+
+                            <span class="badge bg-success">
+                                Sub Course
+                            </span>
+
+                            <p class="mt-3 mb-2">
+                                <strong>Amount Paid:</strong>
+                                ₹@item.Amount
+                            </p>
+
+                            <p class="mb-2">
+                                <strong>Purchased:</strong>
+                                @item.PurchaseDate.ToString("dd-MM-yyyy")
+                            </p>
+
+                            <p class="mb-2">
+                                <strong>Days Left:</strong>
+                                @daysLeft
+                            </p>
+
+                            <p class="mb-2">
+                                <strong>Valid Until:</strong>
+                                @validUntil.ToString("dd-MM-yyyy")
+                            </p>
+
+                            <div class="d-grid mt-3">
+
+                                <a asp-controller="MyCourses"
+                                   asp-action="Learn"
+                                   asp-route-id="@item.SubCourseId"
+                                   class="btn btn-success">
+                                    ▶ Play
+                                </a>
+
+                            </div>
+
+                        </div>
+                    }
+                    @if (item.SubscriptionId != null)
+                    {
+                        var validUntil = item.PurchaseDate
+                            .AddDays(item.SubscriptionData.Validity);
+
+                        var daysLeft = (validUntil.Date - DateTime.Now.Date).Days;
+
+                        if (daysLeft < 0)
+                        {
+                            daysLeft = 0;
+                        }
+
+                        <img src="@item.SubscriptionData.Thumbnail"
+                             class="card-img-top"
+                             style="height:200px; object-fit:cover;" />
+
+                        <div class="card-body">
+
+                            <h5 class="card-title">
+                                @item.SubscriptionData.stype
+                            </h5>
+
+                            <span class="badge bg-success">
+                                Subscription
+                            </span>
+
+                            <p class="mt-3 mb-2">
+                                <strong>Amount Paid:</strong>
+                                ₹@item.Amount
+                            </p>
+
+                            <p class="mb-2">
+                                <strong>Purchased:</strong>
+                                @item.PurchaseDate.ToString("dd-MM-yyyy")
+                            </p>
+
+                            <p class="mb-2">
+                                <strong>Days Left:</strong>
+                                @daysLeft
+                            </p>
+
+                            <p class="mb-2">
+                                <strong>Valid Until:</strong>
+                                @validUntil.ToString("dd-MM-yyyy")
+                            </p>
+
+                            <div class="d-grid mt-3">
+                                <a asp-controller="MyCourses"
+                                   asp-action="StartCourse"
+                                   asp-route-id="@item.SubscriptionId"
+                                   class="btn btn-success">
+                                    ▶ Play
+                                </a>
+                            </div>
+
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+        }
+
+    </div>
+
+</div>

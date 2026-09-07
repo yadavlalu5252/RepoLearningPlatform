@@ -1,0 +1,36 @@
+﻿@model RepoLearningPlatform.Models.User
+
+@if (ViewBag.ErrorMessage != null)
+{
+    <div class="alert alert-danger">
+        @ViewBag.ErrorMessage
+    </div>
+}
+
+<form method="post">
+
+    Name
+    <input type="text" class="form-control" asp-for="Name" />
+    <br />
+
+    Username
+    <input type="text" class="form-control" asp-for="Username" />
+    <br />
+
+    Email
+    <input type="email" class="form-control" asp-for="Email" />
+    <br />
+
+    Password
+    <input type="password" class="form-control" asp-for="Password" />
+    <br />
+
+    <input type="submit" value="Register" class="btn btn-primary" />
+
+</form>
+
+<br />
+
+<a asp-controller="Auth" asp-action="Login">
+    Already have an account? Login
+</a>
