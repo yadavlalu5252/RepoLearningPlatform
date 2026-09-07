@@ -1,0 +1,535 @@
+﻿@model RepoLearningPlatform.Models.SubCourse
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+@{
+    var topics =
+        ViewBag.Topics as List<RepoLearningPlatform.Models.AddTopic>;
+
+    var currentTopic =
+        ViewBag.CurrentTopic as RepoLearningPlatform.Models.AddTopic;
+
+    var material =
+        ViewBag.Material as RepoLearningPlatform.Models.AddMaterial;
+
+    var topicAccess =
+        ViewBag.TopicAccess as Dictionary<int, bool>;
+
+    var topicCompleted =
+        ViewBag.TopicCompleted as Dictionary<int, bool>;
+
+    bool currentCompleted =
+        ViewBag.CurrentCompleted == true;
+
+    bool courseCompleted =
+        ViewBag.CourseCompleted == true;
+}
+
+<div class="container-fluid mt-4">
+
+    <div class="mb-4">
+
+        <h2>
+            @Model.SubCourseName
+        </h2>
+
+        <span class="badge bg-success">
+            @Model.Status
+        </span>
+
+    </div>
+
+    <div class="row">
+
+        <!-- LEFT SIDE -->
+
+        <div class="col-lg-8">
+
+            <!-- VIDEO -->
+
+            <div class="card shadow mb-4">
+
+                <div class="card-body">
+
+                    <h5 class="mb-3">
+                        @currentTopic?.TopicName
+                    </h5>
+
+                    @if (currentTopic != null &&
+                         !string.IsNullOrEmpty(currentTopic.VideoUrl))
+                    {
+                        <div class="ratio ratio-16x9">
+
+                            <iframe src="@currentTopic.VideoUrl"
+                                    title="@currentTopic.TopicName"
+                                    allowfullscreen>
+                            </iframe>
+
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info">
+                            No video available for this topic.
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+
+            <!-- ASSIGNMENT -->
+
+            <div class="card shadow mb-4">
+
+                <div class="card-body">
+
+                    <h4 class="mb-3">
+                        Assignment
+                    </h4>
+
+                    @if (material != null &&
+                         !string.IsNullOrEmpty(material.AssignmentAttachment))
+                    {
+                        <a asp-controller="MyCourses"
+                           asp-action="DownloadAssignment"
+                           asp-route-id="@material.MaterialId"
+                           class="btn btn-primary mb-3">
+
+                            Download Assignment
+
+                        </a>
+
+                        <form asp-controller="MyCourses"
+                              asp-action="UploadSolution"
+                              method="post"
+                              enctype="multipart/form-data">
+
+                            <input type="hidden"
+                                   name="id"
+                                   value="@Model.Id" />
+
+                            <input type="hidden"
+                                   name="topicId"
+                                   value="@currentTopic.Id" />
+
+                            <input type="hidden"
+                                   name="materialId"
+                                   value="@material.MaterialId" />
+
+                            <div class="mb-3">
+
+                                <label class="form-label">
+                                    Upload Solution
+                                </label>
+
+                                <input type="file"
+                                       name="solutionFile"
+                                       class="form-control"
+                                       accept=".pdf,.doc,.docx" />
+
+                            </div>
+
+                            <button type="submit"
+                                    class="btn btn-success">
+
+                                Upload Solution
+
+                            </button>
+
+                        </form>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info">
+                            No assignment available for this topic.
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+
+            <!-- MCQ -->
+
+            <div class="card shadow mb-4">
+
+                <div class="card-body">
+
+                    <h4 class="mb-4">
+                        MCQ
+                    </h4>
+
+                    @if (material != null)
+                    {
+                        @if (currentCompleted)
+                        {
+                            <div class="alert alert-success">
+                                ✅ You have already completed this topic.
+                            </div>
+                        }
+                        else
+                        {
+                            <form asp-controller="MyCourses"
+                                  asp-action="SubmitMCQ"
+                                  method="post">
+
+                                <input type="hidden"
+                                       name="id"
+                                       value="@Model.Id" />
+
+                                <input type="hidden"
+                                       name="topicId"
+                                       value="@currentTopic.Id" />
+
+                                <input type="hidden"
+                                       name="materialId"
+                                       value="@material.MaterialId" />
+
+
+                                <!-- MCQ 1 -->
+
+                                <div class="mb-4">
+
+                                    <h6>
+                                        1. @material.MCQ1Question
+                                    </h6>
+
+                                    <div class="form-check">
+
+                                        <input class="form-check-input"
+                                               type="radio"
+                                               name="mcq1"
+                                               value="A"
+                                               required />
+
+                                        <label class="form-check-label">
+                                            A. @material.MCQ1OptionA
+                                        </label>
+
+                                    </div>
+
+                                    <div class="form-check">
+
+                                        <input class="form-check-input"
+                                               type="radio"
+                                               name="mcq1"
+                                               value="B" />
+
+                                        <label class="form-check-label">
+                                            B. @material.MCQ1OptionB
+                                        </label>
+
+                                    </div>
+
+                                    <div class="form-check">
+
+                                        <input class="form-check-input"
+                                               type="radio"
+                                               name="mcq1"
+                                               value="C" />
+
+                                        <label class="form-check-label">
+                                            C. @material.MCQ1OptionC
+                                        </label>
+
+                                    </div>
+
+                                    <div class="form-check">
+
+                                        <input class="form-check-input"
+                                               type="radio"
+                                               name="mcq1"
+                                               value="D" />
+
+                                        <label class="form-check-label">
+                                            D. @material.MCQ1OptionD
+                                        </label>
+
+                                    </div>
+
+                                </div>
+
+
+                                <!-- MCQ 2 -->
+
+                                <div class="mb-4">
+
+                                    <h6>
+                                        2. @material.MCQ2Question
+                                    </h6>
+
+                                    <div class="form-check">
+
+                                        <input class="form-check-input"
+                                               type="radio"
+                                               name="mcq2"
+                                               value="A"
+                                               required />
+
+                                        <label class="form-check-label">
+                                            A. @material.MCQ2OptionA
+                                        </label>
+
+                                    </div>
+
+                                    <div class="form-check">
+
+                                        <input class="form-check-input"
+                                               type="radio"
+                                               name="mcq2"
+                                               value="B" />
+
+                                        <label class="form-check-label">
+                                            B. @material.MCQ2OptionB
+                                        </label>
+
+                                    </div>
+
+                                    <div class="form-check">
+
+                                        <input class="form-check-input"
+                                               type="radio"
+                                               name="mcq2"
+                                               value="C" />
+
+                                        <label class="form-check-label">
+                                            C. @material.MCQ2OptionC
+                                        </label>
+
+                                    </div>
+
+                                    <div class="form-check">
+
+                                        <input class="form-check-input"
+                                               type="radio"
+                                               name="mcq2"
+                                               value="D" />
+
+                                        <label class="form-check-label">
+                                            D. @material.MCQ2OptionD
+                                        </label>
+
+                                    </div>
+
+                                </div>
+
+
+                                <!-- MCQ 3 -->
+
+                                <div class="mb-4">
+
+                                    <h6>
+                                        3. @material.MCQ3Question
+                                    </h6>
+
+                                    <div class="form-check">
+
+                                        <input class="form-check-input"
+                                               type="radio"
+                                               name="mcq3"
+                                               value="A"
+                                               required />
+
+                                        <label class="form-check-label">
+                                            A. @material.MCQ3OptionA
+                                        </label>
+
+                                    </div>
+
+                                    <div class="form-check">
+
+                                        <input class="form-check-input"
+                                               type="radio"
+                                               name="mcq3"
+                                               value="B" />
+
+                                        <label class="form-check-label">
+                                            B. @material.MCQ3OptionB
+                                        </label>
+
+                                    </div>
+
+                                    <div class="form-check">
+
+                                        <input class="form-check-input"
+                                               type="radio"
+                                               name="mcq3"
+                                               value="C" />
+
+                                        <label class="form-check-label">
+                                            C. @material.MCQ3OptionC
+                                        </label>
+
+                                    </div>
+
+                                    <div class="form-check">
+
+                                        <input class="form-check-input"
+                                               type="radio"
+                                               name="mcq3"
+                                               value="D" />
+
+                                        <label class="form-check-label">
+                                            D. @material.MCQ3OptionD
+                                        </label>
+
+                                    </div>
+
+                                </div>
+
+
+                                <button type="submit"
+                                        class="btn btn-primary">
+
+                                    Submit MCQ
+
+                                </button>
+
+                            </form>
+                        }
+                    }
+                    else
+                    {
+                        <div class="alert alert-info">
+                            No MCQ available for this topic.
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+
+            <!-- COURSE COMPLETION -->
+            @if (courseCompleted)
+            {
+                <div class="card shadow mb-4">
+
+                    <div class="card-body text-center">
+
+                        <h3 class="text-success">
+                            🎉 Course Completed!
+                        </h3>
+
+                        <p class="mb-3">
+                            Congratulations! You have completed
+                            all the topics in this course.
+                        </p>
+
+                        <a asp-controller="MyCourses"
+                           asp-action="DownloadCertificate"
+                           asp-route-id="@Model.Id"
+                           class="btn btn-success">
+
+                            🎓 Download Completion Certificate
+
+                        </a>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+
+
+        <!-- RIGHT SIDE -->
+
+        <div class="col-lg-4">
+
+            <div class="card shadow">
+
+                <div class="card-body">
+
+                    <h4 class="mb-3">
+                        Topics
+                    </h4>
+
+                    @if (topics != null)
+                    {
+                        foreach (var topic in topics)
+                        {
+                            bool unlocked =
+                                topicAccess != null &&
+                                topicAccess.ContainsKey(topic.Id) &&
+                                topicAccess[topic.Id];
+
+                            bool completed =
+                                topicCompleted != null &&
+                                topicCompleted.ContainsKey(topic.Id) &&
+                                topicCompleted[topic.Id];
+
+                            if (unlocked)
+                            {
+                                <a asp-controller="MyCourses"
+                                   asp-action="Learn"
+                                   asp-route-id="@Model.Id"
+                                   asp-route-topicId="@topic.Id"
+                                   class="d-flex justify-content-between align-items-center border-bottom p-2 text-decoration-none">
+
+                                    <span>
+                                        @topic.TopicName
+                                    </span>
+
+                                    @if (completed)
+                                    {
+                                        <span class="badge bg-success">
+                                            ✓
+                                        </span>
+                                    }
+                                    else if (topic.Id == currentTopic?.Id)
+                                    {
+                                        <span class="badge bg-primary">
+                                            ▶
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">
+                                            ▶
+                                        </span>
+                                    }
+
+                                </a>
+                            }
+                            else
+                            {
+                                <div class="d-flex justify-content-between align-items-center border-bottom p-2 text-muted">
+
+                                    <span>
+                                        @topic.TopicName
+                                    </span>
+
+                                    <span class="badge bg-secondary">
+                                        🔒
+                                    </span>
+
+                                </div>
+                            }
+                        }
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

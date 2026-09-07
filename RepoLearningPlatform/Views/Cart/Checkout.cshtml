@@ -1,0 +1,132 @@
+﻿@model List<RepoLearningPlatform.Models.Cart>
+
+@{
+    ViewData["Title"] = "Checkout";
+}
+
+<div class="container mt-4">
+
+    <h2>Checkout</h2>
+
+    <div class="card mt-4">
+        <div class="card-body">
+
+            <h4>Order Summary</h4>
+
+            @foreach (var item in Model)
+            {
+                <div class="d-flex justify-content-between mb-2">
+
+                    @if (item.MasterCourseId != null)
+                    {
+                        <span>
+                            @item.MasterCourseData.MasterCourseName
+                        </span>
+                    }
+
+                    @if (item.SubCourseId != null)
+                    {
+                        <span>
+                            @item.SubCourseData.SubCourseName
+                        </span>
+                    }
+
+                    @if (item.SubscriptionId != null)
+                    {
+                        <span>
+                            @item.SubscriptionData.stype
+                        </span>
+                    }
+
+                    <span>
+                        ₹@item.Amount
+                    </span>
+
+                </div>
+            }
+
+            <hr />
+
+            <div class="d-flex justify-content-between">
+                <strong>Total</strong>
+
+                <strong>
+                    ₹@Model.Sum(x => x.Amount)
+                </strong>
+            </div>
+
+            <button type="button"
+                    class="btn btn-success mt-4"
+                    id="payButton">
+                Pay with Razorpay
+            </button>
+
+        </div>
+    </div>
+
+</div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<script>
+
+    document.getElementById("payButton").addEventListener("click", function() {
+
+        fetch("/Cart/CreateOrder", {
+            method: "POST"
+        })
+            .then(response => response.json())
+            .then(data => {
+
+                var options = {
+                    "key": "@ViewBag.RazorpayKey",
+                    "amount": data.amount,
+                    "currency": "INR",
+                    "name": "RepoLearningPlatform",
+                    "description": "Course Purchase",
+                    "order_id": data.orderId,
+
+                    "handler": function (response) {
+
+    fetch("/Cart/VerifyPayment", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body:
+            "paymentId=" + encodeURIComponent(response.razorpay_payment_id) +
+            "&orderId=" + encodeURIComponent(response.razorpay_order_id) +
+            "&signature=" + encodeURIComponent(response.razorpay_signature)
+    })
+    .then(response => response.json())
+    .then(data => {
+
+        if (data.success) {
+
+    window.location.href = "/MyCourses/Index";
+
+}
+else {
+
+    alert("Payment verification failed!");
+
+}
+
+    });
+
+},
+
+                    "theme": {
+                        "color": "#198754"
+                    }
+                };
+
+                var razorpay = new Razorpay(options);
+
+                razorpay.open();
+
+            });
+
+    });
+
+</script>
